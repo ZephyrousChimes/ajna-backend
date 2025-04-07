@@ -1,0 +1,3 @@
+spring.application.name=whitegold
+
+spring.config.import=optional:secrets.properties
