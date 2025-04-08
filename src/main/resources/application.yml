@@ -1,37 +1,14 @@
+logging:
+  level:
+    root: ERROR
+
 spring:
+  config:
+    import: optional:secrets.yml
+
   application:
     name: whitegold
 
-  config:
-    import: optional:secrets.properties
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-          github:
-            client-id: ${GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET}
-            scope: read:user
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
-            token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
-            user-name-attribute: sub
-
-          github:
-            authorization-uri: https://github.com/login/oauth/authorize
-            token-uri: https://github.com/login/oauth/access_token
-            user-info-uri: https://api.github.com/user
-            user-name-attribute: id
-
-server:
-  port: 8080
+  kiteconnect:
+    uri: "https://kite.zerodha.com/connect/login?v=3&api_key=${kiteconnect.api-key}"
+  
