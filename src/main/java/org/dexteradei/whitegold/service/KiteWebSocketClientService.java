@@ -42,9 +42,9 @@ public class KiteWebSocketClientService {
     """;
 
     public KiteWebSocketClientService(
-        @Value("${kiteconnect.api-key}") String API_KEY,
-        @Value("${kiteconnect.user-id}") String USER_ID,
-        @Value("${kiteconnect.api-secret}") String API_SECRET
+        @Value("${secrets.kiteconnect.api-key}") String API_KEY,
+        @Value("${secrets.kiteconnect.user-id}") String USER_ID,
+        @Value("${secrets.kiteconnect.api-secret}") String API_SECRET
     ) {
         this.API_KEY = API_KEY;
         this.USER_ID = USER_ID;
