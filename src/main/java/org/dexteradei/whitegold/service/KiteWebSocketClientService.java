@@ -25,7 +25,6 @@ import com.zerodhatech.ticker.OnTicks;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
-import reactor.core.publisher.Mono;
 
 @Data
 @Service
@@ -153,16 +152,18 @@ public class KiteWebSocketClientService {
             @Override
             public void onError(Exception exception) {
                 //handle here.
+                tickerProvider.disconnect();
             }
 
             @Override
             public void onError(KiteException kiteException) {
                 //handle here.
+                tickerProvider.disconnect();
             }
 
             @Override
             public void onError(String error) {
-                System.out.println(error);
+                tickerProvider.disconnect();
             }
         });
 
@@ -208,10 +209,10 @@ public class KiteWebSocketClientService {
         tickerProvider.setMode(tokens, KiteTicker.modeLTP);
 
         // Unsubscribe for a token.
-        // tickerProvider.unsubscribe(tokens);
+        tickerProvider.unsubscribe(tokens);
 
         // // After using com.zerodhatech.com.zerodhatech.ticker, close websocket connection.
-        // tickerProvider.disconnect();
+        tickerProvider.disconnect();
     }
 
 }

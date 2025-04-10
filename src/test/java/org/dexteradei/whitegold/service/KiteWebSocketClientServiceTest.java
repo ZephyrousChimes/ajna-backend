@@ -1,6 +1,5 @@
 package org.dexteradei.whitegold.service;
 
-import org.dexteradei.whitegold.service.KiteWebSocketClientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
