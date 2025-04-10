@@ -1,10 +1,21 @@
+spring:
+  config:
+    import: optional:secrets.yml
+
 logging:
   level:
     root: ERROR
 
-spring:
-  config:
-    import: optional:secrets.yml
+server:
+  port: 8080
+  ssl: 
+    enabled: true
+    key-alias: local_ssl
+    key-store: classpath:local-ssl.p12
+    key-store-type: PKCS12
+    key-password: ${secrets.key-password}
+    key-store-password: ${secrets.key-store-password}
+
 
   application:
     name: whitegold
