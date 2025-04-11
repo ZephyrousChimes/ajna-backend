@@ -1,0 +1,25 @@
+spring:
+  config:
+    import: optional:secrets.yml
+
+logging:
+  level:
+    root: ERROR
+
+server:
+  port: 8080
+  ssl: 
+    enabled: true
+    key-alias: local_ssl
+    key-store: classpath:local-ssl.p12
+    key-store-type: PKCS12
+    key-password: ${secrets.ssl.key-password}
+    key-store-password: ${secrets.ssl.key-store-password}
+
+
+  application:
+    name: whitegold
+
+  kiteconnect:
+    uri: "https://kite.zerodha.com/connect/login?v=3&api_key=${secrets.kiteconnect.api-key}"
+  
