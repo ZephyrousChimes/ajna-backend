@@ -15,7 +15,7 @@ import com.zerodhatech.kiteconnect.kitehttp.SessionExpiryHook;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.Order;
 import com.zerodhatech.models.Tick;
-import com.zerodhatech.models.User;
+// import com.zerodhatech.models.User;
 import com.zerodhatech.ticker.KiteTicker;
 import com.zerodhatech.ticker.OnConnect;
 import com.zerodhatech.ticker.OnDisconnect;
@@ -23,7 +23,7 @@ import com.zerodhatech.ticker.OnError;
 import com.zerodhatech.ticker.OnOrderUpdate;
 import com.zerodhatech.ticker.OnTicks;
 
-import jakarta.annotation.PostConstruct;
+// import jakarta.annotation.PostConstruct;
 import lombok.Data;
 
 @Data
@@ -56,7 +56,7 @@ public class KiteWebSocketClientService {
     public void init() {
         KiteConnect kiteConnect = new KiteConnect(API_KEY);
         kiteConnect.setUserId(USER_ID);
-        String url = kiteConnect.getLoginURL();
+        // String url = kiteConnect.getLoginURL();
 
         kiteConnect.setSessionExpiryHook(new SessionExpiryHook() {
             @Override
@@ -69,7 +69,7 @@ public class KiteWebSocketClientService {
             A request token is valid for only a couple of minutes and can be used only once. An access token is valid for one whole day. Don't call this method for every app run.
             Once an access token is received it should be stored in preferences or database for further usage.
         */
-        User user;
+        // User user;
         try {
             // user = kiteConnect.generateSession("7rY17Vl46ulh6FDBDcnAUirk8SrTCVMZ", API_SECRET);
 
