@@ -11,7 +11,7 @@ import org.springframework.web.reactive.socket.client.WebSocketClient;
 import jakarta.annotation.PostConstruct;
 
 
-@Service
+// @Service
 public class KiteWebSocketClient {
 
     String subscriptionJson = """

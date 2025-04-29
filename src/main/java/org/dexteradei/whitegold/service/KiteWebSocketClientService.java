@@ -52,7 +52,7 @@ public class KiteWebSocketClientService {
     }
 
     
-    @PostConstruct
+    // @PostConstruct
     public void init() {
         KiteConnect kiteConnect = new KiteConnect(API_KEY);
         kiteConnect.setUserId(USER_ID);

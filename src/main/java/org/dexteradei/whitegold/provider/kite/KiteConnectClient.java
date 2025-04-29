@@ -38,7 +38,7 @@ public class KiteConnectClient {
 
         Mono<Void> connectEvent = Mono.fromCallable(() -> {
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
+            // options.addArguments("--headless");
             options.addArguments("--ignore-certificate-errors");
             options.setAcceptInsecureCerts(true);
             
