@@ -1,10 +1,13 @@
 package org.dexteradei.whitegold.provider.kite;
 
 import java.io.IOException;
-// import java.text.DecimalFormat;
-// import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 
+import org.dexteradei.whitegold.service.DepthMetricsProducerService;
+import org.dexteradei.whitegold.service.OpenInterestMetricsProducerService;
+import org.dexteradei.whitegold.service.PriceMetricsProducerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.neovisionaries.ws.client.WebSocketException;
@@ -30,6 +33,13 @@ public class KiteConnectAdapter {
 
     private ArrayList<Long> subscribedTokens;
 
+    @Autowired
+    private PriceMetricsProducerService priceProducer;
+    @Autowired
+    private OpenInterestMetricsProducerService oiProducer;
+    @Autowired
+    private DepthMetricsProducerService depthProducer;
+
     public KiteConnectAdapter() {
         kiteConnectSessionObject = null;
         tickerProvider = null;
@@ -50,11 +60,9 @@ public class KiteConnectAdapter {
         tickerProvider.setOnDisconnectedListener(new OnDisconnect() {
             @Override
             public void onDisconnected() {
-                // your code goes here
             }
         });
 
-        /** Set listener to get order updates.*/
         tickerProvider.setOnOrderUpdateListener(new OnOrderUpdate() {
             @Override
             public void onOrderUpdate(Order order) {
@@ -62,16 +70,15 @@ public class KiteConnectAdapter {
             }
         });
 
-        /** Set error listener to listen to errors.*/
         tickerProvider.setOnErrorListener(new OnError() {
             @Override
             public void onError(Exception exception) {
-                //handle here.
+                
             }
 
             @Override
             public void onError(KiteException kiteException) {
-                //handle here.
+                
             }
 
             @Override
@@ -83,39 +90,36 @@ public class KiteConnectAdapter {
         tickerProvider.setOnTickerArrivalListener(new OnTicks() {
             @Override
             public void onTicks(ArrayList<Tick> ticks) {
-                // NumberFormat formatter = new DecimalFormat();
-                System.out.println("last price "+ticks);
-                // if(ticks.size() > 0) {
-                //     System.out.println("last price "+ticks.get(0).getLastTradedPrice());
-                //     System.out.println("open interest "+formatter.format(ticks.get(0).getOi()));
-                //     System.out.println("day high OI "+formatter.format(ticks.get(0).getOpenInterestDayHigh()));
-                //     System.out.println("day low OI "+formatter.format(ticks.get(0).getOpenInterestDayLow()));
-                //     System.out.println("change "+formatter.format(ticks.get(0).getChange()));
-                //     System.out.println("tick timestamp "+ticks.get(0).getTickTimestamp());
-                //     System.out.println("tick timestamp date "+ticks.get(0).getTickTimestamp());
-                //     System.out.println("last traded time "+ticks.get(0).getLastTradedTime());
-                //     System.out.println(ticks.get(0).getMarketDepth().get("buy").size());
-                // }
+                if (ticks.isEmpty()) return;
+                Tick t = ticks.get(0);
+
+                String symbol = String.valueOf(t.getInstrumentToken());
+                Instant ts = t.getTickTimestamp().toInstant();
+
+                priceProducer.produce(symbol, ts, t.getLastTradedPrice(), t.getChange(),
+                                    t.getHighPrice(), t.getLowPrice());
+
+                oiProducer.produce(symbol, ts, t.getOi(), t.getOpenInterestDayHigh(),
+                                t.getOpenInterestDayLow(),
+                                100.0 * (t.getOi() - t.getOpenInterestDayLow()) / (double) t.getOpenInterestDayLow());
+
+                double bestBid = t.getMarketDepth().get("buy").get(0).getPrice();
+                long bestBidQty = t.getMarketDepth().get("buy").get(0).getQuantity();
+                double bestAsk = t.getMarketDepth().get("sell").get(0).getPrice();
+                long bestAskQty = t.getMarketDepth().get("sell").get(0).getQuantity();
+
+                depthProducer.produce(symbol, ts, bestBid, bestBidQty, bestAsk, bestAskQty);
             }
         });
-        // Make sure this is called before calling connect.
-        tickerProvider.setTryReconnection(true);
-        //maximum retries and should be greater than 0
-        tickerProvider.setMaximumRetries(10);
-        //set maximum retry interval in seconds
-        tickerProvider.setMaximumRetryInterval(30);
 
-        /** connects to com.zerodhatech.com.zerodhatech.ticker server for getting live quotes*/
+        tickerProvider.setTryReconnection(true);
+        tickerProvider.setMaximumRetries(10);
+        tickerProvider.setMaximumRetryInterval(30);
         tickerProvider.connect();
 
         boolean isConnected = tickerProvider.isConnectionOpen();
         System.out.println(isConnected);
 
-        /** set mode is used to set mode in which you need tick for list of tokens.
-         * Ticker allows three modes, modeFull, modeQuote, modeLTP.
-         * For getting only last traded price, use modeLTP
-         * For getting last traded price, last traded quantity, average price, volume traded today, total sell quantity and total buy quantity, open, high, low, close, change, use modeQuote
-         * For getting all data with depth, use modeFull*/
         tickerProvider.setMode(tokens, KiteTicker.modeFull);
     }
 
@@ -126,10 +130,8 @@ public class KiteConnectAdapter {
 
     @PreDestroy
     public void cleanConnection() {
-        // Unsubscribe for a token.
         tickerProvider.unsubscribe(this.subscribedTokens);
 
-        // After using com.zerodhatech.com.zerodhatech.ticker, close websocket connection.
         tickerProvider.disconnect();
 
         System.out.println("Disconnected from Kite API");
