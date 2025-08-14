@@ -27,7 +27,7 @@ import com.zerodhatech.ticker.OnTicks;
 import lombok.Data;
 
 @Data
-// @Service
+@Service
 public class KiteWebSocketClientService {
     
     private final String API_KEY;
